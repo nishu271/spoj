@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define PROFILE_TIME
+//#define PROFILE_TIME
 const uint INF = 1000000000;
 const uint NMAX = 10005;
 const uint MMAX = 100005;
@@ -24,12 +24,20 @@ struct heapnode {
 	}
 }heap[NMAX];
 
+struct node {
+	int d, n;
+	node (int dist, int vert) {
+		d = dist;
+		n = vert;
+	}
+};
+
 typedef unsigned int uint;
 
 uint vhmap[NMAX];
 uint dist[NMAX];
 uint dist_rev[NMAX];
-vector <uint> adj[NMAX], adj_rev[NMAX];
+vector <node> adj[NMAX], adj_rev[NMAX];
 map<uint, uint> e, e_rev;
 void swapnode(uint, uint);
 void heapify(uint, uint);
@@ -140,10 +148,8 @@ int main () {
 			fastRead_uint(a);
 			fastRead_uint(b);
 			fastRead_uint(v);
-			e[compute_hash(a,b)] = v;
-			e_rev[compute_hash(b,a)] = v;
-			adj[a].push_back(b);
-			adj_rev[b].push_back(a);
+			adj[a].push_back(node(v, b));
+			adj_rev[b].push_back(node(v, a));
 		}
 		memset(dist, 0, sizeof(dist));
 		memset(dist_rev, 0, sizeof(dist_rev));
@@ -162,8 +168,8 @@ int main () {
 			uint u = top.u;
 			dist[u] = top.key;
 			for (uint j = 0; j < adj[u].size(); j++) {
-				uint v =  adj[u][j];
-				uint dv = dist[u] + e[compute_hash(u,v)];
+				uint v =  adj[u][j].n;
+				uint dv = dist[u] + adj[u][j].d;
 				if (heap[vhmap[v]].key > dv) {
 					update(vhmap[v], sz, dv);
 				}
@@ -184,8 +190,8 @@ int main () {
 			uint u = top.u;
 			dist_rev[u] = top.key;
 			for (uint j = 0; j < adj_rev[u].size(); j++) {
-				uint v =  adj_rev[u][j];
-				uint dv = dist_rev[u] + e_rev[compute_hash(u,v)]; 
+				uint v =  adj_rev[u][j].n;
+				uint dv = dist_rev[u] + adj_rev[u][j].d; 
 				if (heap[vhmap[v]].key > dv) {
 					update(vhmap[v], sz, dv);
 				}
